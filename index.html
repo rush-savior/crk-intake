@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Intake — Credit Repair Kings</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDzu3n6r-GUlI9qhlAlhmIAU7RjL2k-Lk0&libraries=places&callback=initAutocomplete" async defer></script>
+<style>
+  :root {
+    --black:#000000;--black2:#0f0f0f;--black3:#1a1a1a;--black4:#242424;
+    --gold:#d4a017;--gold2:#f0c040;--gold3:#b8860b;
+    --white:#e8e0d0;--gray:#999999;--border:rgba(212,160,23,0.3);
+    --success:#2ecc71;--error:#e74c3c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#ffffff;font-family:'Lato',sans-serif;color:#1a1a1a;min-height:100vh;padding:0 0 80px;overflow-x:hidden;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2),var(--gold),var(--gold3));z-index:100;}
+  .wrapper{max-width:680px;margin:0 auto;padding:0 20px;position:relative;z-index:1;}
+
+  /* HEADER */
+  .header{text-align:center;padding:60px 0 48px;animation:fadeDown 0.8s ease both;}
+  .crown{font-size:38px;margin-bottom:16px;display:block;filter:drop-shadow(0 0 20px rgba(212,160,23,0.6));animation:glow 3s ease-in-out infinite;}
+  @keyframes glow{0%,100%{filter:drop-shadow(0 0 18px rgba(212,160,23,0.55))}50%{filter:drop-shadow(0 0 34px rgba(212,160,23,0.9))}}
+  .brand-name{font-family:'Montserrat',sans-serif;font-size:10px;font-weight:800;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:block;}
+  .header h1{font-family:'Montserrat',sans-serif;font-size:clamp(24px,5vw,36px);font-weight:900;color:#111111;line-height:1.15;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;}
+  .header h1 .gold{color:var(--gold);}
+  .header-divider{width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 16px;}
+  .header p{color:#555555;font-size:14px;font-weight:300;line-height:1.8;max-width:420px;margin:0 auto;}
+  .client-id-tag{display:inline-block;margin-top:14px;padding:6px 16px;background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.3);border-radius:2px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;color:var(--gold);}
+
+  /* STEPS */
+  .steps-row{display:flex;align-items:center;justify-content:center;margin-bottom:40px;}
+  .step-item{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .step-circle{width:36px;height:36px;border-radius:50%;border:2px solid #cccccc;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;color:#888888;transition:all 0.35s ease;}
+  .step-circle.active{border-color:var(--gold);background:var(--gold);color:var(--black);box-shadow:0 0 20px rgba(212,160,23,0.4);}
+  .step-circle.done{border-color:var(--gold3);background:rgba(212,160,23,0.12);color:var(--gold);}
+  .step-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888888;white-space:nowrap;transition:color 0.3s;}
+  .step-item.active .step-label{color:var(--gold);}
+  .step-item.done .step-label{color:var(--gold3);}
+  .step-line{width:48px;height:2px;background:#dddddd;margin:0 4px 22px;transition:background 0.4s;flex-shrink:0;}
+  .step-line.done{background:var(--gold3);}
+  @media(max-width:480px){.step-label{display:none}.step-line{width:24px}}
+
+  /* CARD */
+  .card{background:var(--black2);border:1px solid rgba(212,160,23,0.15);border-radius:4px;overflow:hidden;display:none;animation:slideUp 0.5s ease both;position:relative;}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2));}
+  .card.visible{display:block;}
+  .card-header{padding:32px 36px 28px;border-bottom:1px solid rgba(212,160,23,0.1);display:flex;align-items:center;gap:16px;}
+  .card-icon{width:48px;height:48px;background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.18);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+  .card-title{font-family:'Montserrat',sans-serif;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--white);}
+  .card-subtitle{font-size:12px;color:var(--gray);margin-top:4px;font-weight:300;}
+  .card-body{padding:32px 36px;}
+  @media(max-width:520px){.card-header,.card-body{padding:22px 18px}}
+
+  /* FIELDS */
+  .field-grid{display:grid;gap:20px;}
+  .field-grid.cols-2{grid-template-columns:1fr 1fr;}
+  @media(max-width:520px){.field-grid.cols-2{grid-template-columns:1fr}}
+  .field{display:flex;flex-direction:column;gap:8px;}
+  .field label{font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
+  .field label .req{color:var(--error);margin-left:2px;}
+  .field input,.field select,.field textarea{background:var(--black3);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:14px 16px;color:var(--white);font-family:'Lato',sans-serif;font-size:14px;font-weight:400;outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;-webkit-appearance:none;width:100%;}
+  .field input::placeholder{color:rgba(153,153,153,0.35);font-size:13px;}
+  .field input:focus{border-color:var(--gold);background:rgba(212,160,23,0.03);box-shadow:0 0 0 3px rgba(212,160,23,0.07);}
+  .field input.has-error{border-color:var(--error)!important;box-shadow:0 0 0 3px rgba(231,76,60,0.1)!important;}
+  .err-msg{font-size:11px;color:var(--error);display:none;margin-top:-4px;}
+  .err-msg.show{display:block;}
+
+  /* Google autocomplete */
+  .pac-container{background:#1a1a1a!important;border:1px solid rgba(212,160,23,0.3)!important;border-radius:4px!important;}
+  .pac-item{color:var(--white)!important;padding:8px 14px!important;font-family:'Lato',sans-serif!important;font-size:13px!important;border-top:1px solid rgba(212,160,23,0.1)!important;cursor:pointer;}
+  .pac-item:hover{background:rgba(212,160,23,0.08)!important;}
+  .pac-item-query{color:var(--gold)!important;}
+
+  .tip{font-size:13px;color:var(--gray);font-weight:300;line-height:1.7;}
+  .tip strong{color:var(--gold2);font-weight:700;}
+  .divider{height:1px;background:rgba(212,160,23,0.1);margin:26px 0;}
+
+  /* UPLOAD */
+  .upload-zone{border:2px dashed rgba(212,160,23,0.22);border-radius:4px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.25s;position:relative;background:rgba(212,160,23,0.015);}
+  .upload-zone:hover,.upload-zone.drag{border-color:var(--gold);background:rgba(212,160,23,0.055);}
+  .upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;background:none;padding:0;}
+  .upload-icon{font-size:28px;margin-bottom:10px;display:block;}
+  .upload-text{font-size:13px;color:var(--gray);line-height:1.7;}
+  .upload-text strong{color:var(--gold2);}
+  .upload-filename{margin-top:10px;font-size:12px;color:var(--success);display:none;font-weight:700;}
+  .camera-label{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:9px 18px;background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.25);border-radius:3px;color:var(--gold);font-family:'Montserrat',sans-serif;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
+  .camera-label:hover{background:rgba(212,160,23,0.15);border-color:var(--gold);}
+  .camera-label input{display:none;}
+
+  /* CRED BOX */
+  .cred-box{background:var(--black3);border:1px solid rgba(212,160,23,0.1);border-radius:4px;padding:22px;margin-bottom:14px;}
+  .cred-label{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .bureau-tag{font-family:'Montserrat',sans-serif;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:2px;}
+  .tag-experian{background:rgba(220,53,69,0.13);color:#e06070;border:1px solid rgba(220,53,69,0.28);}
+  .tag-equifax{background:rgba(0,123,255,0.1);color:#5da8ff;border:1px solid rgba(0,123,255,0.22);}
+  .tag-tu{background:rgba(40,167,69,0.1);color:#5cd98a;border:1px solid rgba(40,167,69,0.22);}
+  .tag-sc{background:rgba(212,160,23,0.1);color:var(--gold2);border:1px solid var(--border);}
+  .cred-site{font-size:11px;color:var(--gray);font-weight:300;}
+
+  /* BUTTONS */
+  .nav-buttons{display:flex;gap:12px;justify-content:flex-end;margin-top:30px;padding-top:22px;border-top:1px solid rgba(212,160,23,0.08);}
+  .btn{padding:14px 30px;border-radius:3px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;transition:all 0.2s;}
+  .btn-ghost{background:transparent;color:var(--gray);border:1px solid rgba(255,255,255,0.1);}
+  .btn-ghost:hover{color:var(--white);border-color:rgba(255,255,255,0.22);}
+  .btn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));color:var(--black);position:relative;overflow:hidden;}
+  .btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,160,23,0.32);}
+  .btn-gold:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+  /* SUMMARY */
+  .summary-group{margin-bottom:22px;}
+  .summary-group-title{font-family:'Montserrat',sans-serif;font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(212,160,23,0.15);}
+  .summary-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:3px;font-size:13px;}
+  .summary-row:nth-child(odd){background:rgba(255,255,255,0.02);}
+  .summary-row:nth-child(even){background:rgba(0,0,0,0.2);}
+  .summary-key{color:var(--gray);font-weight:300;}
+  .summary-val{color:var(--white);font-weight:700;text-align:right;max-width:55%;word-break:break-all;font-size:12px;}
+
+  /* SUCCESS */
+  .success-wrap{display:none;animation:slideUp 0.6s ease both;}
+  .success-wrap.visible{display:block;}
+  .success-card{background:var(--black2);border:1px solid rgba(212,160,23,0.18);border-radius:4px;text-align:center;padding:70px 40px;position:relative;overflow:hidden;}
+  .success-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2));}
+  .success-glow{width:88px;height:88px;border-radius:50%;background:rgba(46,204,113,0.07);border:2px solid rgba(46,204,113,0.28);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 26px;box-shadow:0 0 36px rgba(46,204,113,0.12);}
+  .success-card h2{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;color:var(--gold);}
+  .success-card p{color:var(--gray);font-size:14px;font-weight:300;line-height:1.8;max-width:380px;margin:0 auto 20px;}
+  .success-id-box{display:inline-block;margin:16px 0;padding:12px 24px;background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.35);border-radius:3px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;color:var(--gold);}
+  .print-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:transparent;border:1px solid rgba(212,160,23,0.3);border-radius:3px;color:var(--gold);font-family:'Montserrat',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;margin-top:10px;}
+  .print-btn:hover{background:rgba(212,160,23,0.08);border-color:var(--gold);}
+
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+  @media print{
+    body{background:white;color:black;}
+    body::before{display:none;}
+    .nav-buttons,.steps-row,.header{display:none;}
+    .card{display:block!important;border:1px solid #ddd;background:white;color:black;}
+    .card::before{display:none;}
+    .card-title{color:black;}
+    .card-body,.card-header{padding:16px;}
+    .summary-row{background:#f9f9f9!important;}
+    .summary-key{color:#555;}
+    .summary-val{color:black;}
+    .summary-group-title{color:#b8860b;}
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <span class="crown">👑</span>
+    <span class="brand-name">Credit Repair Kings</span>
+    <h1><span class="gold">Client</span> Intake <span class="gold">Form</span></h1>
+    <div class="header-divider"></div>
+    <p>Complete all sections below to get started. Your information is 100% confidential and used solely to begin your credit restoration journey.</p>
+    <div class="client-id-tag">🔢 Client ID: <span id="headerClientId"></span></div>
+  </div>
+
+  <div class="steps-row" id="stepsRow"></div>
+
+  <!-- STEP 1: Personal -->
+  <div class="card visible" id="step-0">
+    <div class="card-header">
+      <div class="card-icon">👤</div>
+      <div>
+        <div class="card-title">Personal Information</div>
+        <div class="card-subtitle">Basic identity &amp; contact details</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="field-grid cols-2">
+        <div class="field">
+          <label>First Name <span class="req">*</span></label>
+          <input type="text" id="firstName" placeholder="John">
+          <span class="err-msg" id="e-firstName">Please enter your first name.</span>
+        </div>
+        <div class="field">
+          <label>Last Name <span class="req">*</span></label>
+          <input type="text" id="lastName" placeholder="Smith">
+          <span class="err-msg" id="e-lastName">Please enter your last name.</span>
+        </div>
+        <div class="field">
+          <label>Date of Birth <span class="req">*</span></label>
+          <input type="date" id="dob">
+          <span class="err-msg" id="e-dob">Please enter your date of birth.</span>
+        </div>
+        <div class="field">
+          <label>Last 4 of SSN <span class="req">*</span></label>
+          <input type="text" id="ssn4" placeholder="XXXX" maxlength="4" inputmode="numeric">
+          <span class="err-msg" id="e-ssn4">Must be exactly 4 digits.</span>
+        </div>
+        <div class="field">
+          <label>Phone Number <span class="req">*</span></label>
+          <input type="tel" id="phone" placeholder="(555) 000-0000" maxlength="14">
+          <span class="err-msg" id="e-phone">Please enter a valid 10-digit phone number.</span>
+        </div>
+        <div class="field">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="john@email.com">
+          <span class="err-msg" id="e-email">Please enter a valid email address.</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="field">
+        <label>Current Address <span class="req">*</span></label>
+        <input type="text" id="address" placeholder="Start typing your address…" autocomplete="off">
+        <span class="err-msg" id="e-address">Please enter your address.</span>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-gold" onclick="goTo(1)">Next Step →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Documents -->
+  <div class="card" id="step-1">
+    <div class="card-header">
+      <div class="card-icon">📋</div>
+      <div>
+        <div class="card-title">Identity Verification</div>
+        <div class="card-subtitle">Upload or photograph your required documents</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="field-grid">
+        <div class="field">
+          <label>Driver's License <span class="req">*</span></label>
+          <div class="upload-zone" id="dlZone">
+            <input type="file" id="dlFile" accept="image/*,.pdf" onchange="handleFile(this,'dlZone','dlStatus')">
+            <span class="upload-icon">🪪</span>
+            <div class="upload-text"><strong>Click to upload</strong> or drag &amp; drop<br>JPG, PNG, or PDF — front of license</div>
+            <div class="upload-filename" id="dlStatus"></div>
+          </div>
+          <label class="camera-label">
+            📸 Take Photo with Camera
+            <input type="file" accept="image/*" capture="environment" onchange="handleFile(this,'dlZone','dlStatus')">
+          </label>
+          <span class="err-msg" id="e-dlFile">Please upload your Driver's License.</span>
+        </div>
+        <div class="field">
+          <label>Proof of Address <span class="req">*</span></label>
+          <div class="upload-zone" id="poaZone">
+            <input type="file" id="poaFile" accept="image/*,.pdf" onchange="handleFile(this,'poaZone','poaStatus')">
+            <span class="upload-icon">🏠</span>
+            <div class="upload-text"><strong>Click to upload</strong> or drag &amp; drop<br>Utility bill, bank or credit card statement</div>
+            <div class="upload-filename" id="poaStatus"></div>
+          </div>
+          <label class="camera-label">
+            📸 Take Photo with Camera
+            <input type="file" accept="image/*" capture="environment" onchange="handleFile(this,'poaZone','poaStatus')">
+          </label>
+          <span class="err-msg" id="e-poaFile">Please upload your Proof of Address.</span>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-ghost" onclick="goTo(0)">← Back</button>
+        <button class="btn btn-gold" onclick="goTo(2)">Next Step →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: SmartCredit -->
+  <div class="card" id="step-2">
+    <div class="card-header">
+      <div class="card-icon">📊</div>
+      <div>
+        <div class="card-title">SmartCredit Access</div>
+        <div class="card-subtitle">3-bureau credit audit portal</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="tip" style="margin-bottom:22px;">First, create your account at <strong>www.smartcredit.com/crk</strong> — then enter your login credentials below so we can run your full credit audit.</p>
+      <div class="cred-box">
+        <div class="cred-label">
+          <span class="bureau-tag tag-sc">SmartCredit</span>
+          <span class="cred-site">smartcredit.com/crk</span>
+        </div>
+        <div class="field-grid cols-2">
+          <div class="field">
+            <label>Username / Email</label>
+            <input type="text" id="scUser" placeholder="your@email.com">
+            <span class="err-msg" id="e-scUser">Please enter your SmartCredit username.</span>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="text" id="scPass" placeholder="Your password">
+            <span class="err-msg" id="e-scPass">Please enter your SmartCredit password.</span>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+        <button class="btn btn-gold" onclick="goTo(3)">Next Step →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Bureaus -->
+  <div class="card" id="step-3">
+    <div class="card-header">
+      <div class="card-icon">🔐</div>
+      <div>
+        <div class="card-title">Credit Bureau Access</div>
+        <div class="card-subtitle">Experian · Equifax · TransUnion</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="tip" style="margin-bottom:22px;">Create <strong>free accounts</strong> at each bureau below, then provide your login details so we can access your full credit profile.</p>
+      <div class="cred-box">
+        <div class="cred-label"><span class="bureau-tag tag-experian">Experian</span><span class="cred-site">experian.com</span></div>
+        <div class="field-grid cols-2">
+          <div class="field"><label>Username / Email</label><input type="text" id="expUser" placeholder="username or email"><span class="err-msg" id="e-expUser">Required.</span></div>
+          <div class="field"><label>Password</label><input type="text" id="expPass" placeholder="password"><span class="err-msg" id="e-expPass">Required.</span></div>
+        </div>
+      </div>
+      <div class="cred-box">
+        <div class="cred-label"><span class="bureau-tag tag-equifax">Equifax</span><span class="cred-site">equifax.com</span></div>
+        <div class="field-grid cols-2">
+          <div class="field"><label>Username / Email</label><input type="text" id="eqUser" placeholder="username or email"><span class="err-msg" id="e-eqUser">Required.</span></div>
+          <div class="field"><label>Password</label><input type="text" id="eqPass" placeholder="password"><span class="err-msg" id="e-eqPass">Required.</span></div>
+        </div>
+      </div>
+      <div class="cred-box">
+        <div class="cred-label"><span class="bureau-tag tag-tu">TransUnion</span><span class="cred-site">transunion.com</span></div>
+        <div class="field-grid cols-2">
+          <div class="field"><label>Username / Email</label><input type="text" id="tuUser" placeholder="username or email"><span class="err-msg" id="e-tuUser">Required.</span></div>
+          <div class="field"><label>Password</label><input type="text" id="tuPass" placeholder="password"><span class="err-msg" id="e-tuPass">Required.</span></div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+        <button class="btn btn-gold" onclick="goTo(4)">Review &amp; Submit →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5: Review -->
+  <div class="card" id="step-4">
+    <div class="card-header">
+      <div class="card-icon">✅</div>
+      <div>
+        <div class="card-title">Review &amp; Confirm</div>
+        <div class="card-subtitle">Verify your information before submitting</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="summaryContent"></div>
+      <div class="nav-buttons">
+        <button class="btn btn-ghost" onclick="goTo(3)">← Back</button>
+        <button class="btn btn-gold" id="submitBtn" onclick="submitForm()">Submit Intake ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-wrap" id="successScreen">
+    <div class="success-card">
+      <div class="success-glow">✓</div>
+      <h2>You're All Set!</h2>
+      <p>Your intake form and documents have been received. A member of the Credit Repair Kings team will review your file and reach out to you shortly.</p>
+      <div class="success-id-box">🔢 Client ID: <span id="successClientId"></span></div>
+      <p style="font-size:13px;">A confirmation email has been sent to your inbox.</p>
+      <button class="print-btn" onclick="window.print()">🖨️ &nbsp;Print My Summary</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── CONFIG (no editing needed) ──
+const SHEET_URL   = 'https://script.google.com/macros/s/AKfycbwroMNotFbXG4T8CyGQl_zEyy-1EacI14BZ7gVvoSTjeZfFyqh-mZcOSi-C7xeRIM0T/exec';
+const OWNER_EMAIL = 'support@saviorinsurance.com';
+
+// Client ID
+const CLIENT_ID = 'CRK-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2,5).toUpperCase();
+document.getElementById('headerClientId').textContent = CLIENT_ID;
+
+// Steps
+const TOTAL = 5, LABELS = ['Personal','Documents','SmartCredit','Bureaus','Review'];
+let current = 0;
+const row = document.getElementById('stepsRow');
+LABELS.forEach((lbl, i) => {
+  const item = document.createElement('div');
+  item.className = 'step-item' + (i===0?' active':'');
+  item.id = 'si-'+i;
+  item.innerHTML = `<div class="step-circle${i===0?' active':''}" id="sc-${i}">${i+1}</div><div class="step-label">${lbl}</div>`;
+  row.appendChild(item);
+  if (i < TOTAL-1) {
+    const line = document.createElement('div');
+    line.className = 'step-line'; line.id = 'line-'+i;
+    row.appendChild(line);
+  }
+});
+
+function updateSteps() {
+  LABELS.forEach((_,i) => {
+    const item = document.getElementById('si-'+i);
+    const circle = document.getElementById('sc-'+i);
+    item.className   = 'step-item'   + (i===current?' active':i<current?' done':'');
+    circle.className = 'step-circle' + (i===current?' active':i<current?' done':'');
+    circle.textContent = i < current ? '✓' : i+1;
+    const line = document.getElementById('line-'+i);
+    if (line) line.className = 'step-line' + (i<current?' done':'');
+  });
+}
+
+// Phone auto-format
+document.getElementById('phone').addEventListener('input', function(e) {
+  let v = e.target.value.replace(/\D/g,'').substring(0,10);
+  let f = '';
+  if (v.length > 0) f = '(' + v.substring(0,3);
+  if (v.length >= 4) f += ') ' + v.substring(3,6);
+  if (v.length >= 7) f += '-' + v.substring(6,10);
+  e.target.value = f;
+});
+
+// SSN digits only
+document.getElementById('ssn4').addEventListener('input', function(e) {
+  e.target.value = e.target.value.replace(/\D/g,'').substring(0,4);
+});
+
+// Google Places
+function initAutocomplete() {
+  const input = document.getElementById('address');
+  const ac = new google.maps.places.Autocomplete(input, { types:['address'], componentRestrictions:{country:'us'} });
+  ac.addListener('place_changed', () => {
+    const place = ac.getPlace();
+    if (place.formatted_address) { input.value = place.formatted_address; setErr('address',false); }
+  });
+}
+
+// Error helpers
+function setErr(id, show, msg) {
+  const el = document.getElementById(id);
+  const em = document.getElementById('e-'+id);
+  if (!el || !em) return;
+  if (show) { el.classList.add('has-error'); em.classList.add('show'); if(msg) em.textContent=msg; }
+  else       { el.classList.remove('has-error'); em.classList.remove('show'); }
+}
+
+// File handling with compression
+let dlFileData=null, dlFileType='image/jpeg', dlFileName='', dlReady=false;
+let poaFileData=null, poaFileType='image/jpeg', poaFileName='', poaReady=false;
+
+function compressImage(file) {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith('image/')) {
+      const r = new FileReader();
+      r.onload = () => resolve({ data: r.result.split(',')[1], type: file.type });
+      r.readAsDataURL(file); return;
+    }
+    const r = new FileReader();
+    r.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1024;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h*MAX/w); w = MAX; }
+        const c = document.createElement('canvas');
+        c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        resolve({ data: c.toDataURL('image/jpeg',0.75).split(',')[1], type:'image/jpeg' });
+      };
+      img.src = ev.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+function handleFile(input, zoneId, statusId) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById(statusId);
+  statusEl.textContent = '⏳ Processing…';
+  statusEl.style.display = 'block';
+  document.getElementById(zoneId).style.borderColor = 'var(--gold)';
+  if (zoneId==='dlZone')  { setErr('dlFile',false);  dlReady=false; }
+  if (zoneId==='poaZone') { setErr('poaFile',false); poaReady=false; }
+  compressImage(file).then(result => {
+    if (zoneId==='dlZone')  { dlFileData=result.data;  dlFileType=result.type;  dlFileName=file.name;  dlReady=true; }
+    else                    { poaFileData=result.data; poaFileType=result.type; poaFileName=file.name; poaReady=true; }
+    statusEl.textContent = '✓ ' + file.name;
+    document.getElementById(zoneId).style.borderColor = 'var(--success)';
+  });
+}
+
+document.querySelectorAll('.upload-zone').forEach(z => {
+  z.addEventListener('dragover', e => { e.preventDefault(); z.classList.add('drag'); });
+  z.addEventListener('dragleave', () => z.classList.remove('drag'));
+  z.addEventListener('drop', () => z.classList.remove('drag'));
+});
+
+// Validation
+function validateStep(step) {
+  let ok = true;
+  if (step === 0) {
+    ['firstName','lastName','dob','address'].forEach(id => {
+      const empty = !document.getElementById(id).value.trim();
+      setErr(id, empty); if (empty) ok = false;
+    });
+    const ssn = document.getElementById('ssn4').value;
+    const badSsn = !/^\d{4}$/.test(ssn);
+    setErr('ssn4', badSsn); if (badSsn) ok = false;
+    const email = document.getElementById('email').value.trim();
+    const badEmail = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    setErr('email', badEmail); if (badEmail) ok = false;
+    const phone = document.getElementById('phone').value.replace(/\D/g,'');
+    const badPhone = phone.length !== 10;
+    setErr('phone', badPhone); if (badPhone) ok = false;
+  }
+  if (step === 1) {
+    if (!dlReady)  { setErr('dlFile',  true, "Please upload your Driver's License."); ok = false; }
+    if (!poaReady) { setErr('poaFile', true, 'Please upload your Proof of Address.'); ok = false; }
+  }
+  if (step === 2) {
+    ['scUser','scPass'].forEach(id => {
+      const empty = !document.getElementById(id).value.trim();
+      setErr(id, empty); if (empty) ok = false;
+    });
+  }
+  if (step === 3) {
+    ['expUser','expPass','eqUser','eqPass','tuUser','tuPass'].forEach(id => {
+      const empty = !document.getElementById(id).value.trim();
+      setErr(id, empty); if (empty) ok = false;
+    });
+  }
+  return ok;
+}
+
+// Navigation
+function goTo(step) {
+  if (step > current && !validateStep(current)) return;
+  document.getElementById('step-'+current)?.classList.remove('visible');
+  current = step;
+  if (step===4) buildSummary();
+  const next = document.getElementById('step-'+step);
+  if (next) { next.style.animation='none'; next.offsetHeight; next.style.animation=''; next.classList.add('visible'); }
+  updateSteps();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Value helper
+function v(id) { const el = document.getElementById(id); return el ? (el.value.trim()||'—') : '—'; }
+
+// Summary
+function buildSummary() {
+  const groups = [
+    { title:'🔢 Client ID', rows:[['Client ID', CLIENT_ID]] },
+    { title:'👤 Personal Information', rows:[
+      ['Full Name', v('firstName')+' '+v('lastName')],
+      ['Date of Birth', v('dob')],
+      ['Last 4 SSN', v('ssn4')!=='—'?'••••'+v('ssn4'):'—'],
+      ['Phone', v('phone')], ['Email', v('email')], ['Address', v('address')],
+    ]},
+    { title:'📋 Documents', rows:[
+      ["Driver's License", dlFileName||'Not uploaded'],
+      ['Proof of Address', poaFileName||'Not uploaded'],
+    ]},
+    { title:'📊 SmartCredit', rows:[
+      ['Username', v('scUser')],
+      ['Password', v('scPass')!=='—'?'••••••••':'—'],
+    ]},
+    { title:'🔐 Credit Bureaus', rows:[
+      ['Experian User',v('expUser')],['Experian Pass',v('expPass')!=='—'?'••••••••':'—'],
+      ['Equifax User',v('eqUser')],['Equifax Pass',v('eqPass')!=='—'?'••••••••':'—'],
+      ['TransUnion User',v('tuUser')],['TransUnion Pass',v('tuPass')!=='—'?'••••••••':'—'],
+    ]},
+  ];
+  document.getElementById('summaryContent').innerHTML = groups.map(g =>
+    `<div class="summary-group"><div class="summary-group-title">${g.title}</div>` +
+    g.rows.map(([k,val]) =>
+      `<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${val}</span></div>`
+    ).join('') + '</div>'
+  ).join('');
+}
+
+// Submit — sends text first, then photos separately to avoid payload size issues
+async function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  // STEP 1: Send all text data (no photos) — fast and reliable
+  const textData = {
+    clientId:    CLIENT_ID,
+    submittedAt: new Date().toLocaleString(),
+    ownerEmail:  OWNER_EMAIL,
+    type:        'text',
+    personal: {
+      firstName: v('firstName'), lastName: v('lastName'),
+      dob: v('dob'), ssn_last4: v('ssn4'),
+      phone: v('phone'), email: v('email'), address: v('address')
+    },
+    documents: {
+      dlName:  dlFileName  || 'Not provided',
+      dlData:  '',
+      dlType:  dlFileType  || 'image/jpeg',
+      poaName: poaFileName || 'Not provided',
+      poaData: '',
+      poaType: poaFileType || 'image/jpeg',
+    },
+    smartCredit: { username: v('scUser'), password: v('scPass') },
+    bureaus: {
+      experian:   { username: v('expUser'), password: v('expPass') },
+      equifax:    { username: v('eqUser'),  password: v('eqPass')  },
+      transunion: { username: v('tuUser'),  password: v('tuPass')  },
+    }
+  };
+
+  fetch(SHEET_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(textData)
+  })
+  .then(() => {
+    // Show success screen immediately after text data sent
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('visible'));
+    document.getElementById('stepsRow').style.display = 'none';
+    document.querySelector('.header').style.display   = 'none';
+    document.getElementById('successClientId').textContent = CLIENT_ID;
+    document.getElementById('successScreen').classList.add('visible');
+    window.scrollTo({top:0,behavior:'smooth'});
+
+    // STEP 2: Send photos separately in background (if any)
+    if (dlFileData || poaFileData) {
+      const photoData = {
+        clientId:    CLIENT_ID,
+        ownerEmail:  OWNER_EMAIL,
+        type:        'photos',
+        personal: { firstName: v('firstName'), lastName: v('lastName') },
+        documents: {
+          dlName:  dlFileName  || 'Not provided',
+          dlData:  dlFileData  || '',
+          dlType:  dlFileType  || 'image/jpeg',
+          poaName: poaFileName || 'Not provided',
+          poaData: poaFileData || '',
+          poaType: poaFileType || 'image/jpeg',
+        }
+      };
+      fetch(SHEET_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(photoData)
+      }).catch(err => console.error('Photo upload error:', err));
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Submit Intake ✓';
+    alert('Submission failed. Please check your connection and try again.');
+  });
+}
+</script>
+</body>
+</html>
