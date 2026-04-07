@@ -373,7 +373,7 @@
 <script>
 // ── CONFIG (no editing needed) ──
 const SHEET_URL   = 'https://script.google.com/macros/s/AKfycbwroMNotFbXG4T8CyGQl_zEyy-1EacI14BZ7gVvoSTjeZfFyqh-mZcOSi-C7xeRIM0T/exec';
-const OWNER_EMAIL = 'roland@creditrepairkings.com';
+const OWNER_EMAIL = 'support@saviorinsurance.com';
 
 // Client ID
 const CLIENT_ID = 'CRK-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2,5).toUpperCase();
@@ -613,7 +613,6 @@ async function submitForm() {
 
   fetch(SHEET_URL, {
     method: 'POST',
-    mode: 'no-cors',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(textData)
   })
@@ -644,7 +643,6 @@ async function submitForm() {
       };
       fetch(SHEET_URL, {
         method: 'POST',
-        mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(photoData)
       }).catch(err => console.error('Photo upload error:', err));
